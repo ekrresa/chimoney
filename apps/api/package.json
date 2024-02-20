@@ -7,7 +7,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsup src/index.ts --watch --onSuccess 'node dist/index.cjs'",
-    "build": "tsup src/index.ts"
+    "build": "tsup src/index.ts",
+    "db:push": "drizzle-kit push:pg",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:studio": "drizzle-kit studio --port 3001"
   },
   "keywords": [],
   "author": "Ochuko Ekrresa",
@@ -16,7 +20,9 @@
     "@t3-oss/env-core": "^0.9.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
+    "drizzle-orm": "^0.29.3",
     "express": "^4.18.2",
+    "pg": "^8.11.3",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -25,7 +31,11 @@
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^20.10.6",
+    "@types/pg": "^8.11.0",
+    "drizzle-kit": "^0.20.14",
+    "drizzle-zod": "^0.5.1",
     "tsup": "^8.0.2",
+    "tsx": "^4.7.1",
     "typescript": "^5.3.3"
   }
 }

@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express, { type Express } from 'express'
 
 export const createServer = (): Express => {
