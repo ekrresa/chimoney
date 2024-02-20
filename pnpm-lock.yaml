@@ -11,9 +11,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:^
         version: link:packages/eslint-config
-      '@repo/prettier-config':
-        specifier: workspace:*
-        version: link:packages/prettier-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:packages/typescript-config
@@ -23,6 +20,9 @@ importers:
       prettier-plugin-tailwindcss:
         specifier: ^0.5.11
         version: 0.5.11(prettier@3.2.5)
+      tailwindcss-react-aria-components:
+        specifier: ^1.1.1
+        version: 1.1.1
       turbo:
         specifier: latest
         version: 1.12.4
@@ -48,9 +48,6 @@ importers:
       '@repo/eslint-config':
         specifier: workspace:*
         version: link:../../packages/eslint-config
-      '@repo/prettier-config':
-        specifier: workspace:*
-        version: link:../../packages/prettier-config
       '@repo/typescript-config':
         specifier: workspace:*
         version: link:../../packages/typescript-config
@@ -151,12 +148,6 @@ importers:
       typescript:
         specifier: ^5.3.3
         version: 5.3.3
-
-  packages/prettier-config:
-    devDependencies:
-      prettier:
-        specifier: ^3.1.1
-        version: 3.1.1
 
   packages/typescript-config: {}
 
@@ -5358,11 +5349,6 @@ packages:
       prettier: 3.2.5
     dev: true
 
-  /prettier@3.1.1:
-    resolution: {integrity: sha512-22UbSzg8luF4UuZtzgiUOfcGM8s4tjBv6dJRT7j275NXsy2jb4aJa4NNveul5x4eqlF1wuhuR2RElK71RvmVaw==}
-    engines: {node: '>=14'}
-    dev: true
-
   /prettier@3.2.5:
     resolution: {integrity: sha512-3/GWa9aOC0YeD7LUfvOG2NiDyhOWRvt1k+rcKhOuYnMY24iiCphgneUfJDyFXd6rZCAnuLBv6UeAULtrhT/F4A==}
     engines: {node: '>=14'}
@@ -6048,6 +6034,12 @@ packages:
     dependencies:
       '@pkgr/utils': 2.4.2
       tslib: 2.6.2
+    dev: true
+
+  /tailwindcss-react-aria-components@1.1.1:
+    resolution: {integrity: sha512-ig2pJOz4Gb10uYbGrFiIb5Fs3hUlZ5fTaNfDmLMofVhwXLpyOY+swaSBNg3XzS0ccQHgag3vXxIuHQXVetKYQg==}
+    peerDependencies:
+      tailwindcss: '>=3.0.0 || insiders'
     dev: true
 
   /tailwindcss@3.4.1:
