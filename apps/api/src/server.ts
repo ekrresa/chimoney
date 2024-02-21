@@ -2,6 +2,7 @@ import 'dotenv/config'
 import express, { type Express } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
+import { router } from './routes'
 
 export const createServer = (): Express => {
   const app = express()
@@ -15,6 +16,7 @@ export const createServer = (): Express => {
     .get('/', (req, res) => {
       res.send('Hello World!')
     })
+    .use(router)
 
   return app
 }
