@@ -16,7 +16,7 @@ export const createServer = (): Express => {
     .get('/', (req, res) => {
       res.send('Hello World!')
     })
-    .use(router)
+    .use('/api', router)
 
   return app
 }

@@ -13,7 +13,7 @@ import {
 
 export const authRouter: Router = Router()
 
-authRouter.post('/register', async (req, res) => {
+authRouter.post('/signup', async (req, res) => {
   const result = await newUserSchema.safeParseAsync(req.body)
 
   if (!result.success) {
