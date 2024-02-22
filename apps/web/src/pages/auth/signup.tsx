@@ -1,21 +1,18 @@
-import React from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, FieldError, Input, Label, TextField } from 'react-aria-components'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { signIn } from 'next-auth/react'
 import { toast } from 'sonner'
-import { z } from 'zod'
 
-const signupSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email').trim(),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
-})
+import { SignupInput, signupSchema } from '@/services/auth/types'
+import { useSignup } from '@/hooks/useSignup'
 
 export default function Signup() {
   const router = useRouter()
+
+  const { signup, isLoading } = useSignup()
+
   const { control, handleSubmit } = useForm({
     defaultValues: {
       name: '',
@@ -25,23 +22,22 @@ export default function Signup() {
     resolver: zodResolver(signupSchema),
   })
 
-  const submitForm = async (values: z.infer<typeof signupSchema>) => {
-    const result = await signIn('signup', {
-      ...values,
-      redirect: false,
-    })
+  const submitForm = async (values: SignupInput) => {
+    signup(values, {
+      onSuccess() {
+        setTimeout(() => {
+          router.push('/auth/verify')
+        }, 3000)
 
-    if (result?.ok) {
-      router.push('/')
-    } else {
-      toast(result?.error)
-    }
+        toast.success('Account created successfully')
+      },
+    })
   }
 
   return (
     <div>
       <div className="mx-auto mt-40 w-full max-w-[420px] px-5">
-        <h2 className="mb-16 text-center text-2xl font-semibold">Create your account</h2>
+        <h2 className="mb-16 text-2xl font-semibold">Sign up</h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitForm)}>
           <Controller
@@ -121,7 +117,7 @@ export default function Signup() {
             }
             type="submit"
           >
-            Create account
+            {isLoading ? 'Loading...' : 'Create account'}
           </Button>
         </form>
 

@@ -1,5 +1,15 @@
-import { pgTable, text, timestamp, uniqueIndex, varchar } from 'drizzle-orm/pg-core'
+import {
+  pgEnum,
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uniqueIndex,
+  varchar,
+} from 'drizzle-orm/pg-core'
 import { createId } from '@paralleldrive/cuid2'
+
+export const userStatusEnum = pgEnum('status', ['active', 'inactive'])
 
 export const users = pgTable(
   'users',
@@ -12,6 +22,7 @@ export const users = pgTable(
     email: varchar('email', { length: 255 }).notNull(),
     emailVerifiedAt: timestamp('email_verified_at', { mode: 'string' }),
     phoneNumber: varchar('phone_number', { length: 100 }),
+    status: userStatusEnum('status').notNull().default('inactive'),
     password: text('password').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow(),
@@ -42,4 +53,16 @@ export const sessions = pgTable(
       userIdIndex: uniqueIndex('user_id_idx').on(table.userId),
     }
   },
+)
+
+export const verificationTokens = pgTable(
+  'verification_tokens',
+  {
+    userId: varchar('user_id', { length: 255 }).notNull(),
+    code: varchar('code', { length: 255 }).notNull(),
+    expiresAt: timestamp('expires_at', { mode: 'date' }).notNull(),
+  },
+  table => ({
+    compoundKey: primaryKey({ columns: [table.userId, table.code] }),
+  }),
 )

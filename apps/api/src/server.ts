@@ -17,6 +17,14 @@ export const createServer = (): Express => {
       res.send('Hello World!')
     })
     .use('/api', router)
+    .use((req, res) => {
+      res.status(404).send('Not found')
+    })
+  // Add global error handler
+  // .use((err, req, res, next) => {
+  //   console.error(err)
+  //   res.status(500).send('Internal server error')
+  // })
 
   return app
 }

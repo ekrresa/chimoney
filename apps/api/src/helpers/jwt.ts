@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 import { env } from '@/env'
+import { db } from '@/db'
+import { sessions } from '@/db/schema'
 
 export function generateAccessToken(userId: string) {
   return new Promise<string>((resolve, reject) => {
@@ -61,4 +63,23 @@ export function verifyRefreshToken(token: string) {
       return resolve(payload.userId)
     })
   })
+}
+
+export async function generateSessionTokens(userId: string) {
+  const accessToken = await generateAccessToken(userId)
+  const refreshToken = await generateRefreshToken(userId)
+
+  await db
+    .insert(sessions)
+    .values({
+      userId: userId,
+      refreshToken: refreshToken,
+      updatedAt: new Date().toISOString(),
+    })
+    .onConflictDoUpdate({
+      target: sessions.userId,
+      set: { refreshToken: refreshToken },
+    })
+
+  return { accessToken, refreshToken }
 }

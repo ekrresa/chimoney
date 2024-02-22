@@ -39,7 +39,7 @@ export default function Login() {
   return (
     <div>
       <div className="mx-auto mt-40 w-full max-w-[420px] px-5">
-        <h2 className="mb-16 text-center text-2xl font-semibold">Log in</h2>
+        <h2 className="mb-16 text-2xl font-semibold">Log in</h2>
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitForm)}>
           <Controller

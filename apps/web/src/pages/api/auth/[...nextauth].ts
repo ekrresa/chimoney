@@ -1,11 +1,8 @@
-import { request } from '@/lib/request'
 import NextAuth from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 
-type AuthResponse = {
-  accessToken: string
-  refreshToken: string
-}
+import { AuthService } from '@/services/auth'
+import { loginSchema, verificationCodeSchema } from '@/services/auth/types'
 
 export default NextAuth({
   providers: [
@@ -15,35 +12,37 @@ export default NextAuth({
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
       },
+      //@ts-expect-error
       async authorize(credentials) {
         try {
-          const response = await request.post<AuthResponse>('/auth/login', credentials)
-          console.log(response.data)
-          return null
-        } catch (error) {
-          return null
-        }
-      },
-    }),
-    CredentialsProvider({
-      id: 'signup',
-      credentials: {
-        name: { label: 'Name', type: 'text' },
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      // @ts-expect-error
-      async authorize(credentials) {
-        try {
-          const response = await request.post<AuthResponse>('/auth/signup', credentials)
-          const data = response.data
-
+          const input = await loginSchema.parseAsync(credentials)
+          const data = await AuthService.login(input)
           return {
             accessToken: data.accessToken,
             refreshToken: data.refreshToken,
           }
         } catch (error: any) {
           throw new Error(error?.response?.data?.message)
+        }
+      },
+    }),
+    CredentialsProvider({
+      id: 'verify',
+      credentials: {
+        code: { label: 'Code', type: 'text' },
+      },
+      // @ts-expect-error
+      async authorize(credentials) {
+        try {
+          const input = await verificationCodeSchema.parseAsync(credentials)
+          const data = await AuthService.verifyEmail(input)
+
+          return {
+            accessToken: data.accessToken,
+            refreshToken: data.refreshToken,
+          }
+        } catch (error: any) {
+          throw new Error(error?.response?.data?.message || 'An error occurred')
         }
       },
     }),
