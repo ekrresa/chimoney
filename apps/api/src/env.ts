@@ -4,7 +4,7 @@ import 'dotenv/config'
 
 export const env = createEnv({
   server: {
-    NODE_ENV: z.enum(['development', 'ci', 'production']),
+    NODE_ENV: z.enum(['development', 'test', 'production']),
     DATABASE_URL: z.string().url(),
     ACCESS_TOKEN_SECRET: z.string().min(1),
     REFRESH_TOKEN_SECRET: z.string().min(1),
