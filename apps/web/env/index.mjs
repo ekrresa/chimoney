@@ -3,14 +3,7 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    NEXTAUTH_URL: z
-      .string()
-      .url()
-      .refine(
-        () => (process.env.NODE_ENV === 'production' ? false : true),
-        'NEXTAUTH_URL is required in production',
-      ),
-    NEXTAUTH_SECRET: z.string().min(1),
+    NEXTAUTH_URL: z.string().url(),
   },
   client: {
     NEXT_PUBLIC_API_URL: z.string().min(1),
@@ -19,4 +12,5 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
+  skipValidation: process.env.NODE_ENV === 'ci',
 })
