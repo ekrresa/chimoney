@@ -12,9 +12,6 @@ on:
     paths:
       - 'apps/web/**'
 
-env:
-  NODE_ENV: ci
-
 jobs:
   build:
     runs-on: ubuntu-latest

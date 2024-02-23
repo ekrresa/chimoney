@@ -14,7 +14,6 @@ on:
 
 env:
   DATABASE_URL: ${{ secrets.DATABASE_URL }}
-  NODE_ENV: ci
 
 defaults:
   run:
