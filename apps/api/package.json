@@ -16,6 +16,9 @@
   "keywords": [],
   "author": "Ochuko Ekrresa",
   "license": "ISC",
+  "engines": {
+    "node": "18.17.1"
+  },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",
     "@react-email/render": "^0.0.12",
