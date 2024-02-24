@@ -14,14 +14,9 @@ import {
   newUserSchema,
   verifyEmailSchema,
 } from '@/validation'
-import {
-  generateAccessToken,
-  generateRefreshToken,
-  generateSessionTokens,
-  verifyRefreshToken,
-} from '@/helpers/jwt'
+import { generateSessionTokens, verifyRefreshToken } from '@/lib/jwt'
 import { WelcomeEmail } from 'transactional/emails/WelcomeEmail'
-import { httpRequest } from '@/helpers/request'
+import { httpRequest } from '@/lib/request'
 
 const client = new postmark.ServerClient(env.POSTMARK_API_KEY)
 
