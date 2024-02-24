@@ -21,7 +21,6 @@ defaults:
 
 jobs:
   build:
-    name: Build and run migrations
     runs-on: ubuntu-latest
 
     steps:

@@ -2,6 +2,8 @@ import { createEnv } from '@t3-oss/env-core'
 import { z } from 'zod'
 import 'dotenv/config'
 
+console.log(typeof process.env.CI)
+
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(['development', 'test', 'production']),
@@ -13,5 +15,6 @@ export const env = createEnv({
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
-  skipValidation: process.env.NODE_ENV === 'ci',
+  //@ts-expect-error
+  skipValidation: process.env.CI === true,
 })

@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
+    CI: z.coerce.boolean().default(false),
     NEXTAUTH_URL: z.string().url(),
   },
   client: {
