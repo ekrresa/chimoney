@@ -61,7 +61,7 @@ authRouter.post('/signup', async (req, res) => {
   const emailHtml = await renderAsync(WelcomeEmail({ code: code, name: user.name }))
 
   const options = {
-    From: 'hey@ekrresa.com',
+    From: 'peercash@ekrresa.com',
     To: user.email,
     Subject: 'Welcome to PeerCash',
     HtmlBody: emailHtml,
@@ -150,7 +150,7 @@ authRouter.post('/verify', async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' })
   }
 
-  await httpRequest.post('/sub-account/create', {
+  const accountResponse = await httpRequest.post('/sub-account/create', {
     name: user.name,
     email: user.email,
     meta: {
@@ -161,7 +161,11 @@ authRouter.post('/verify', async (req, res) => {
   await db.transaction(async tx => {
     await tx
       .update(users)
-      .set({ status: 'active', emailVerifiedAt: new Date().toISOString() })
+      .set({
+        accountId: accountResponse.data.data.id,
+        status: 'active',
+        emailVerifiedAt: new Date().toISOString(),
+      })
       .where(eq(users.id, verifyResult.userId))
 
     await tx
