@@ -1,10 +1,10 @@
-import { defineConfig, type Options } from "tsup";
+import { defineConfig, type Options } from 'tsup'
 
-import "./src/env";
+import './src/env'
 
 export default defineConfig((options: Options) => ({
-  entryPoints: ["src/index.ts"],
+  entryPoints: ['src/index.ts'],
   clean: true,
-  format: ["cjs"],
+  format: ['esm'],
   ...options,
-}));
+}))
