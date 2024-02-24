@@ -15,6 +15,5 @@ export const env = createEnv({
   },
   runtimeEnv: process.env,
   emptyStringAsUndefined: true,
-  //@ts-expect-error
-  skipValidation: process.env.CI === true,
+  skipValidation: Boolean(process.env.CI),
 })

@@ -3,7 +3,6 @@ import { z } from 'zod'
 
 export const env = createEnv({
   server: {
-    CI: z.coerce.boolean().default(false),
     NEXTAUTH_URL: z.string().url(),
   },
   client: {
@@ -13,5 +12,5 @@ export const env = createEnv({
   experimental__runtimeEnv: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
-  skipValidation: process.env.CI === true,
+  skipValidation: Boolean(process.env.CI),
 })
