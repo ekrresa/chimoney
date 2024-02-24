@@ -21,6 +21,7 @@ import {
   verifyRefreshToken,
 } from '@/helpers/jwt'
 import { WelcomeEmail } from 'transactional/emails/WelcomeEmail'
+import { httpRequest } from '@/helpers/request'
 
 const client = new postmark.ServerClient(env.POSTMARK_API_KEY)
 
@@ -105,8 +106,7 @@ authRouter.post('/login', async (req, res) => {
     return res.status(400).json({ message: 'Invalid credentials' })
   }
 
-  const accessToken = await generateAccessToken(user.id)
-  const refreshToken = await generateRefreshToken(user.id)
+  const { accessToken, refreshToken } = await generateSessionTokens(user.id)
 
   await db
     .insert(sessions)
@@ -144,6 +144,24 @@ authRouter.post('/verify', async (req, res) => {
   if (!isAfter(verifyResult.expiresAt, new Date())) {
     return res.status(400).json({ message: 'Code is expired. Please re-register' })
   }
+
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, verifyResult.userId))
+    .limit(1)
+
+  if (!user) {
+    return res.status(500).json({ message: 'Internal server error' })
+  }
+
+  await httpRequest.post('/sub-account/create', {
+    name: user.name,
+    email: user.email,
+    meta: {
+      userId: user.id,
+    },
+  })
 
   await db.transaction(async tx => {
     await tx
