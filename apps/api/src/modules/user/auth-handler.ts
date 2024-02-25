@@ -2,16 +2,22 @@ import { Request, Response } from 'express'
 import { isAfter } from 'date-fns'
 
 import { HttpError } from '@/lib/error'
-import * as ChimoneyService from '@/chimoney/service'
+import { ChimoneyService } from '@/chimoney/service'
 import { sendWelcomeEmail } from '@/lib/email'
-import * as UserService from './service'
+import { UserService } from './service'
 import * as UserUtils from './utils'
 import {
   LoginInput,
   LogoutInput,
   NewUserInput,
+  TokenRefreshInput,
   VerifyEmailInput,
 } from './validation'
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from '@/lib/jwt'
 
 export async function loginUser(req: Request, res: Response) {
   const requestBody = <LoginInput>req.body
@@ -34,8 +40,8 @@ export async function loginUser(req: Request, res: Response) {
     throw new HttpError(400, 'Invalid credentials')
   }
 
-  const accessToken = await UserUtils.generateAccessToken(user.id)
-  const refreshToken = await UserUtils.generateRefreshToken(user.id)
+  const accessToken = await generateAccessToken(user.id)
+  const refreshToken = await generateRefreshToken(user.id)
 
   await UserService.saveUserSession({
     userId: user.id,
@@ -86,7 +92,7 @@ export async function signupUser(req: Request, res: Response) {
 export async function logoutUser(req: Request, res: Response) {
   const requestBody = <LogoutInput>req.body
 
-  const userId = await UserUtils.verifyRefreshToken(requestBody.refreshToken)
+  const userId = await verifyRefreshToken(requestBody.refreshToken)
 
   await UserService.deleteUserSession(userId)
 
@@ -122,8 +128,8 @@ export async function verifyUserEmail(req: Request, res: Response) {
 
   await UserService.activateNewUser(user.id, accountResponse.id)
 
-  const accessToken = await UserUtils.generateAccessToken(user.id)
-  const refreshToken = await UserUtils.generateRefreshToken(user.id)
+  const accessToken = await generateAccessToken(user.id)
+  const refreshToken = await generateRefreshToken(user.id)
 
   await UserService.saveUserSession({
     userId: user.id,
@@ -133,4 +139,30 @@ export async function verifyUserEmail(req: Request, res: Response) {
   return res
     .status(200)
     .json({ message: 'Email verified', data: { accessToken, refreshToken } })
+}
+
+export async function refreshTokens(req: Request, res: Response) {
+  const requestBody = <TokenRefreshInput>req.body
+
+  const userId = await verifyRefreshToken(requestBody.token).catch(() => {
+    throw new HttpError(401, 'Unauthorized')
+  })
+
+  // check if there's an active session
+  const userSession = await UserService.getUserSession(userId)
+  if (!userSession) {
+    throw new HttpError(401, 'Unauthorized')
+  }
+
+  const accessToken = await generateAccessToken(userId)
+  const refreshToken = await generateRefreshToken(userId)
+
+  await UserService.saveUserSession({
+    userId: userId,
+    refreshToken: refreshToken,
+  })
+
+  return res
+    .status(200)
+    .json({ message: 'Tokens refreshed', data: { accessToken, refreshToken } })
 }

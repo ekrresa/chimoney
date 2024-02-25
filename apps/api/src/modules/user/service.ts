@@ -6,7 +6,7 @@ import { addHours } from 'date-fns'
 type NewUser = typeof users.$inferInsert
 type NewSession = typeof sessions.$inferInsert
 
-export async function activateNewUser(userId: string, accountId: string) {
+async function activateNewUser(userId: string, accountId: string) {
   await db.transaction(async tx => {
     await tx
       .update(users)
@@ -21,29 +21,30 @@ export async function activateNewUser(userId: string, accountId: string) {
   })
 }
 
-export async function deleteUser(userId: string) {
+async function deleteUser(userId: string) {
   await db.delete(users).where(eq(sessions.userId, userId))
 }
 
-export async function deleteUserSession(userId: string) {
+async function deleteUserSession(userId: string) {
   await db.delete(sessions).where(eq(sessions.userId, userId))
 }
 
-export async function saveUserSession(session: NewSession) {
+async function saveUserSession(session: NewSession) {
   await db
     .insert(sessions)
     .values({
       userId: session.userId,
       refreshToken: session.refreshToken,
-      updatedAt: new Date().toISOString(),
     })
     .onConflictDoUpdate({
       target: sessions.userId,
-      set: { refreshToken: session.refreshToken },
+      set: {
+        refreshToken: session.refreshToken,
+      },
     })
 }
 
-export async function getVerificationCode(verificationCode: string) {
+async function getVerificationCode(verificationCode: string) {
   const [result] = await db
     .select()
     .from(verificationTokens)
@@ -52,19 +53,29 @@ export async function getVerificationCode(verificationCode: string) {
   return result
 }
 
-export async function getUserById(userId: string) {
+async function getUserById(userId: string) {
   const [user] = await db.select().from(users).where(eq(users.id, userId)).limit(1)
 
   return user
 }
 
-export async function getUserByEmail(email: string) {
+async function getUserByEmail(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1)
 
   return user
 }
 
-export async function saveVerificationCode(userId: string) {
+async function getUserSession(userId: string) {
+  const [session] = await db
+    .select()
+    .from(sessions)
+    .where(eq(sessions.userId, userId))
+    .limit(1)
+
+  return session
+}
+
+async function saveVerificationCode(userId: string) {
   const code = Math.floor(Math.random() * 899999 + 100000).toString()
 
   const [result] = await db
@@ -79,8 +90,21 @@ export async function saveVerificationCode(userId: string) {
   return result?.code
 }
 
-export async function saveUser(newUser: NewUser) {
+async function saveUser(newUser: NewUser) {
   const [user] = await db.insert(users).values(newUser).returning()
 
   return user
+}
+
+export const UserService = {
+  activateNewUser,
+  deleteUser,
+  deleteUserSession,
+  getVerificationCode,
+  getUserById,
+  getUserByEmail,
+  getUserSession,
+  saveUser,
+  saveUserSession,
+  saveVerificationCode,
 }

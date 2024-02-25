@@ -1,12 +1,12 @@
 import { httpRequest } from '@/lib/request'
-import { CreateChimoneyAccountResponse } from './types'
+import { ChimoneyAccount, CreateChimoneyAccountResponse } from './types'
 
 type CreateChimoneyAccountInput = {
   name: string
   email: string
   userId: string
 }
-export async function createChimoneyAccount(input: CreateChimoneyAccountInput) {
+async function createAccount(input: CreateChimoneyAccountInput) {
   const response = await httpRequest.post<CreateChimoneyAccountResponse>(
     '/sub-account/create',
     {
@@ -19,4 +19,19 @@ export async function createChimoneyAccount(input: CreateChimoneyAccountInput) {
   )
 
   return response.data.data
+}
+
+async function getAccountDetails(accountId: string) {
+  const response = await httpRequest.get<ChimoneyAccount>('/sub-account/get', {
+    params: {
+      id: accountId,
+    },
+  })
+
+  return response.data.data
+}
+
+export const ChimoneyService = {
+  createChimoneyAccount: createAccount,
+  getAccountDetails,
 }
