@@ -92,7 +92,9 @@ export async function signupUser(req: Request, res: Response) {
 export async function logoutUser(req: Request, res: Response) {
   const requestBody = <LogoutInput>req.body
 
-  const userId = await verifyRefreshToken(requestBody.refreshToken)
+  const userId = await verifyRefreshToken(requestBody.refreshToken).catch(() => {
+    throw new HttpError(400, 'Bad request')
+  })
 
   await UserService.deleteUserSession(userId)
 
