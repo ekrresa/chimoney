@@ -28,9 +28,14 @@ async function logout(refreshToken: string) {
 }
 
 async function refreshAccessToken(refreshToken: string) {
-  return await request.post<GenericResponse<AuthResponse>>('/auth/tokens/refresh', {
-    refreshToken,
-  })
+  const response = await request.post<GenericResponse<AuthResponse>>(
+    '/auth/tokens/refresh',
+    {
+      refreshToken,
+    },
+  )
+
+  return response.data
 }
 
 export const AuthService = {

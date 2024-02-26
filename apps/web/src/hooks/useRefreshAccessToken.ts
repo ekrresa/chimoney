@@ -18,7 +18,12 @@ export function useRefreshAccessToken() {
         return await signOut()
       }
 
-      return AuthService.refreshAccessToken(refreshToken)
+      const response = await AuthService.refreshAccessToken(refreshToken)
+
+      if (response.data) {
+        localforage.setItem('access_token', response.data.accessToken)
+        localforage.setItem('refresh_token', response.data.accessToken)
+      }
     },
     staleTime: 1000 * 60 * 2, // keep data fresh for 2 minutes to dedupe any additional requests within this window
   })

@@ -10,16 +10,23 @@ export function AuthWrapper({ children }: React.PropsWithChildren) {
 
   useRefreshAccessToken()
 
+  const [isTokensSet, setIsTokensSet] = React.useState(false)
+
   React.useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.push(`/auth/login?redirectUrl=${router.asPath}`)
-    } else {
-      localforage.setItem('access_token', data?.user.accessToken)
-      localforage.setItem('refresh_token', data?.user.refreshToken)
-    }
+    ;(async function runSessionEffect() {
+      if (status === 'unauthenticated') {
+        setIsTokensSet(false)
+        router.push(`/auth/login?redirectUrl=${router.asPath}`)
+      } else {
+        await localforage.setItem('access_token', data?.user.accessToken)
+        await localforage.setItem('refresh_token', data?.user.refreshToken)
+
+        setIsTokensSet(true)
+      }
+    })()
   }, [data?.user.accessToken, status, router])
 
   if (status === 'loading' || status === 'unauthenticated') return null
 
-  return <>{children}</>
+  return isTokensSet ? <>{children}</> : null
 }
