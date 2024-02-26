@@ -27,7 +27,7 @@ export default function Signup() {
       onSuccess() {
         setTimeout(() => {
           router.push('/auth/verify')
-        }, 3000)
+        }, 2000)
 
         toast.success('Account created successfully')
       },

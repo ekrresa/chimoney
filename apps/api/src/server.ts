@@ -1,8 +1,11 @@
 import 'dotenv/config'
+import 'express-async-errors'
 import express, { type Express } from 'express'
 import morgan from 'morgan'
 import cors from 'cors'
-import { router } from './routes'
+
+import { router } from '@/routes'
+import { globalErrorHandler } from '@/lib/error'
 
 export const createServer = (): Express => {
   const app = express()
@@ -13,18 +16,14 @@ export const createServer = (): Express => {
     .use(morgan('dev'))
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
-    .get('/', (req, res) => {
+    .get('/', (_req, res) => {
       res.send('Hello World!')
     })
     .use('/api', router)
     .use((req, res) => {
-      res.status(404).send('Not found')
+      res.status(404).json({ message: 'Route not found' })
     })
-  // Add global error handler
-  // .use((err, req, res, next) => {
-  //   console.error(err)
-  //   res.status(500).send('Internal server error')
-  // })
+    .use(globalErrorHandler)
 
   return app
 }
