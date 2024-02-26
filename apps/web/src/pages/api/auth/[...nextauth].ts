@@ -16,10 +16,11 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           const input = await loginSchema.parseAsync(credentials)
-          const data = await AuthService.login(input)
+          const response = await AuthService.login(input)
+
           return {
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
           }
         } catch (error: any) {
           throw new Error(error?.response?.data?.message)
@@ -35,11 +36,11 @@ export default NextAuth({
       async authorize(credentials) {
         try {
           const input = await verificationCodeSchema.parseAsync(credentials)
-          const data = await AuthService.verifyEmail(input)
+          const response = await AuthService.verifyEmail(input)
 
           return {
-            accessToken: data.accessToken,
-            refreshToken: data.refreshToken,
+            accessToken: response.data.accessToken,
+            refreshToken: response.data.refreshToken,
           }
         } catch (error: any) {
           throw new Error(error?.response?.data?.message || 'An error occurred')
