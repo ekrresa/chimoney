@@ -17,8 +17,18 @@ async function verifyEmail(input: { code: string }) {
   return response.data
 }
 
+async function logout(refreshToken: string) {
+  return await request.post('/auth/logout', { refreshToken })
+}
+
+async function refreshAccessToken(refreshToken: string) {
+  return await request.post('/auth/tokens/refresh', { refreshToken })
+}
+
 export const AuthService = {
   login,
+  logout,
+  refreshAccessToken,
   signup,
   verifyEmail,
 }
