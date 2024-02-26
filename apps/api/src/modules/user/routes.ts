@@ -33,9 +33,7 @@ authRouter.post(
 authRouter.post(
   '/tokens/refresh',
   validateRequestBody(TokenRefreshSchema),
-  (req, res) => {
-    res.send('profile')
-  },
+  AuthHandler.refreshTokens,
 )
 
 userRouter.get('/me', checkUserAuth, UserHandler.getUserProfile)

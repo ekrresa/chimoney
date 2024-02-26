@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import { z } from 'zod'
-import jwt from 'jsonwebtoken'
 
 import { HttpError } from './error'
 import { session, setRequestUserId } from './session'
@@ -24,17 +23,14 @@ export function checkUserAuth(req: Request, _: Response, next: NextFunction) {
   const token = authHeader.split(' ')[1]
 
   if (!token) {
-    throw new HttpError(401, 'Unauthorized')
+    throw new HttpError(401, 'Unauthorized A')
   }
 
   verifyAccessToken(token)
-    .then(token => {
-      const tokenPayload = jwt.decode(token) as { userId: string } | null
-      if (!tokenPayload) {
+    .then(userId => {
+      if (!userId) {
         throw new HttpError(401, 'Please login')
       }
-
-      const userId = tokenPayload['userId']
 
       session.run(() => {
         setRequestUserId(userId)
@@ -42,6 +38,6 @@ export function checkUserAuth(req: Request, _: Response, next: NextFunction) {
       })
     })
     .catch(() => {
-      throw new HttpError(401, 'Unauthorized')
+      throw new HttpError(401, 'Unauthorized B')
     })
 }

@@ -3,17 +3,17 @@ import { ZodError } from 'zod'
 
 export function globalErrorHandler(
   err: Error,
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) {
   if (err instanceof HttpError) {
-    res.status(err.statusCode).json({ message: err.message })
+    return res.status(err.statusCode).json({ message: err.message })
   }
 
   if (err instanceof ZodError) {
     const errors = err.flatten().fieldErrors
-    res.status(400).json({ message: 'Request body is invalid', errors })
+    return res.status(400).json({ message: 'Request body is invalid', errors })
   }
 
   res.status(500).json({ message: 'Internal server error' })
