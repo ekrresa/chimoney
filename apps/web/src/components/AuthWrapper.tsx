@@ -2,13 +2,10 @@ import * as React from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import * as localforage from 'localforage'
-import { useRefreshAccessToken } from '@/hooks/useRefreshAccessToken'
 
 export function AuthWrapper({ children }: React.PropsWithChildren) {
   const router = useRouter()
   const { status, data } = useSession()
-
-  useRefreshAccessToken()
 
   const [isTokensSet, setIsTokensSet] = React.useState(false)
 
@@ -19,8 +16,6 @@ export function AuthWrapper({ children }: React.PropsWithChildren) {
         router.push(`/auth/login?redirectUrl=${router.asPath}`)
       } else {
         await localforage.setItem('access_token', data?.user.accessToken)
-        await localforage.setItem('refresh_token', data?.user.refreshToken)
-
         setIsTokensSet(true)
       }
     })()

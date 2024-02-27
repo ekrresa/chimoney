@@ -10,10 +10,8 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import localforage from 'localforage'
 import { Toaster } from 'sonner'
 
-import { REFRESH_TOKEN_QUERY_KEY } from '@/lib/constants'
 import '@/styles/globals.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -38,30 +36,20 @@ export default function App({
           queries: {
             retry: 2,
             refetchOnWindowFocus: process.env.NODE_ENV === 'production',
-            staleTime: 1000 * 60,
+            staleTime: 1000 * 60 * 2, // 2 minutes
           },
         },
         queryCache: new QueryCache({
           onError: async error => {
             if (error.response?.status === 401) {
-              const accessToken = await localforage.getItem('access_token')
-              if (!accessToken) {
-                return await signOut()
-              }
-
-              await queryClient.fetchQuery({ queryKey: [REFRESH_TOKEN_QUERY_KEY] })
+              await signOut()
             }
           },
         }),
         mutationCache: new MutationCache({
           onError: async error => {
             if (error.response?.status === 401) {
-              const accessToken = await localforage.getItem('access_token')
-              if (!accessToken) {
-                return await signOut()
-              }
-
-              await queryClient.fetchQuery({ queryKey: [REFRESH_TOKEN_QUERY_KEY] })
+              await signOut()
             }
           },
         }),

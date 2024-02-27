@@ -20,5 +20,4 @@ export type SignupInput = z.infer<typeof signupSchema>
 
 export type AuthResponse = {
   accessToken: string
-  refreshToken: string
 }

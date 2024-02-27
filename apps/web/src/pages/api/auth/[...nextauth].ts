@@ -20,7 +20,6 @@ export default NextAuth({
 
           return {
             accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
           }
         } catch (error: any) {
           throw new Error(error?.response?.data?.message)
@@ -40,7 +39,6 @@ export default NextAuth({
 
           return {
             accessToken: response.data.accessToken,
-            refreshToken: response.data.refreshToken,
           }
         } catch (error: any) {
           throw new Error(error?.response?.data?.message || 'An error occurred')
@@ -58,7 +56,6 @@ export default NextAuth({
       if (user) {
         token.user = {
           accessToken: user.accessToken,
-          refreshToken: user.refreshToken,
         }
       }
 

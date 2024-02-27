@@ -23,25 +23,8 @@ async function verifyEmail(input: { code: string }) {
   return response.data
 }
 
-async function logout(refreshToken: string) {
-  return await request.post('/auth/logout', { refreshToken })
-}
-
-async function refreshAccessToken(refreshToken: string) {
-  const response = await request.post<GenericResponse<AuthResponse>>(
-    '/auth/tokens/refresh',
-    {
-      refreshToken,
-    },
-  )
-
-  return response.data
-}
-
 export const AuthService = {
   login,
-  logout,
-  refreshAccessToken,
   signup,
   verifyEmail,
 }
