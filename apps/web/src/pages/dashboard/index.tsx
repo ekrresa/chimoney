@@ -2,8 +2,10 @@ import * as React from 'react'
 import { Button } from 'react-aria-components'
 import { Layout } from '@/components/Layout'
 import { useGetProfile } from '@/hooks/useGetProfile'
+import { useRouter } from 'next/router'
 
 export default function Dashboard() {
+  const router = useRouter()
   const { data } = useGetProfile()
 
   const account = data?.account
@@ -19,9 +21,9 @@ export default function Dashboard() {
                 <h2 className="mb-2 capitalize">{wallet.type} balance</h2>
 
                 <p className="mb-4 text-2xl font-semibold">
-                  {new Intl.NumberFormat('en-NG', {
+                  {new Intl.NumberFormat('en-US', {
                     style: 'currency',
-                    currency: 'NGN',
+                    currency: 'USD',
                     useGrouping: true,
                     signDisplay: 'auto',
                     maximumFractionDigits: 2,
@@ -35,7 +37,10 @@ export default function Dashboard() {
 
       <div className="mb-8 rounded-lg border border-zinc-200 bg-white p-5">
         <div className="flex gap-4">
-          <Button className="rounded-lg bg-zinc-800 px-4 py-2 text-sm text-white">
+          <Button
+            className="rounded-lg bg-zinc-800 px-4 py-2 text-sm text-white"
+            onPress={() => router.push('/send')}
+          >
             Send
           </Button>
           <Button className="rounded-lg bg-zinc-800 px-4 py-2 text-sm text-white">
