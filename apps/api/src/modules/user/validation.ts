@@ -13,17 +13,7 @@ export const LoginSchema = z.object({
 })
 export type LoginInput = z.infer<typeof LoginSchema>
 
-export const LogoutSchema = z.object({
-  refreshToken: z.string().min(1),
-})
-export type LogoutInput = z.infer<typeof LogoutSchema>
-
 export const VerifyEmailSchema = z.object({
   code: z.string().length(6, 'Invalid code'),
 })
 export type VerifyEmailInput = z.infer<typeof VerifyEmailSchema>
-
-export const TokenRefreshSchema = z.object({
-  token: z.string().trim().min(1),
-})
-export type TokenRefreshInput = z.infer<typeof TokenRefreshSchema>

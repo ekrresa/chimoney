@@ -1,65 +1,77 @@
-import React from 'react'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { Button, FieldError, Input, Label, TextField } from 'react-aria-components'
-import { signIn } from 'next-auth/react'
-import { Controller, useForm } from 'react-hook-form'
+import { Layout } from '@/components/Layout'
+import { useGetProfile } from '@/hooks/useGetProfile'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast } from 'sonner'
+import { ChevronLeftIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
+import React from 'react'
+import { Button, FieldError, Input, Label, TextField } from 'react-aria-components'
+import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email').trim(),
-  password: z.string().min(8, 'Password must be at least 8 characters long'),
+const walletFormSchema = z.object({
+  recipientId: z.string().trim(),
+  accountId: z.string().trim(),
+  amount: z
+    .string()
+    .trim()
+    .refine(
+      v => {
+        let n = Number(v)
+        return !isNaN(n) && v?.length > 0
+      },
+      { message: 'Invalid number' },
+    ),
 })
 
-export default function Login() {
+type WalletFormInput = z.infer<typeof walletFormSchema>
+
+export default function Wallet() {
   const router = useRouter()
-  const { control, handleSubmit } = useForm({
+
+  const { data } = useGetProfile()
+
+  const { control, handleSubmit, reset } = useForm<WalletFormInput>({
     defaultValues: {
-      email: '',
-      password: '',
+      recipientId: '',
+      amount: '',
+      accountId: '',
     },
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(walletFormSchema),
+    mode: 'onBlur',
   })
 
-  const submitForm = async (values: z.infer<typeof loginSchema>) => {
-    const result = await signIn('login', {
-      ...values,
-      redirect: false,
-    })
-
-    const redirectUrl = router.query?.redirectUrl
-
-    if (result?.ok) {
-      if (redirectUrl) {
-        router.push(redirectUrl as string)
-      } else {
-        router.push('/dashboard')
-      }
-    } else {
-      toast(result?.error)
+  React.useEffect(() => {
+    if (data?.account.id) {
+      reset({ accountId: data?.account.id })
     }
+  }, [data?.account])
+
+  const sendMoney = (values: WalletFormInput) => {
+    console.log(values)
   }
 
   return (
     <div>
-      <div className="mx-auto mt-40 w-full max-w-[420px] px-5">
-        <h2 className="mb-16 text-2xl font-semibold">Log in</h2>
+      <Button className="mb-6 inline-flex items-center gap-1" onPress={router.back}>
+        <ChevronLeftIcon className="h-5 w-5" />
+        <p>Back</p>
+      </Button>
 
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit(submitForm)}>
+      <h1 className="mb-4 text-2xl font-bold">Send to recipient's wallet</h1>
+
+      <div className="mb-8 rounded-lg border border-zinc-200 bg-white p-5">
+        <form className="flex flex-col gap-8" onSubmit={handleSubmit(sendMoney)}>
           <Controller
             control={control}
-            name="email"
+            name="recipientId"
             render={({ field, fieldState }) => (
               <TextField
                 className="flex flex-col gap-1"
                 isInvalid={fieldState.invalid}
                 onChange={field.onChange}
                 value={field.value}
-                type="email"
               >
-                <Label className="font-medium">Email</Label>
+                <Label className="font-medium">User ID</Label>
                 <Input
                   className={({ isInvalid }) =>
                     `w-full rounded-lg border px-4 py-2.5 text-sm shadow-sm outline-none transition-colors focus:outline-1 focus:outline-offset-1 focus:outline-zinc-300 ${isInvalid ? 'outline-1 outline-red-500' : ''}`
@@ -74,16 +86,15 @@ export default function Login() {
 
           <Controller
             control={control}
-            name="password"
+            name="amount"
             render={({ field, fieldState }) => (
               <TextField
-                className={() => `flex flex-col gap-1`}
+                className="flex flex-col gap-1"
                 isInvalid={fieldState.invalid}
                 onChange={field.onChange}
                 value={field.value}
-                type="password"
               >
-                <Label className="font-medium">Password</Label>
+                <Label className="font-medium">Amount (USD)</Label>
                 <Input
                   className={({ isInvalid }) =>
                     `w-full rounded-lg border px-4 py-2.5 text-sm shadow-sm outline-none transition-colors focus:outline-1 focus:outline-offset-1 focus:outline-zinc-300 ${isInvalid ? 'outline-1 outline-red-500' : ''}`
@@ -98,21 +109,18 @@ export default function Login() {
 
           <Button
             className={() =>
-              `w-full rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white`
+              `rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white`
             }
             type="submit"
           >
-            Log in
+            Send
           </Button>
         </form>
-
-        <div className="mt-4 flex items-center gap-1 text-sm">
-          <p>Don&apos;t have an account?</p>
-          <Link href="/auth/signup" className="text-blue-500">
-            Signup
-          </Link>
-        </div>
       </div>
     </div>
   )
+}
+
+Wallet.getLayout = function getLayout(page: React.ReactElement) {
+  return <Layout>{page}</Layout>
 }

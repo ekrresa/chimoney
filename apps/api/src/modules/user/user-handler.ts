@@ -12,10 +12,8 @@ export async function getUserProfile(req: Request, res: Response) {
     throw new HttpError(401, 'Unauthorized')
   }
 
-  const userP = UserService.getUserById(userId)
-  const chimoneyAccountP = ChimoneyService.getAccountDetails(userId)
-
-  const [user, chimoneyAccount] = await Promise.all([userP, chimoneyAccountP])
+  const user = await UserService.getUserById(userId)
+  const chimoneyAccount = await ChimoneyService.getAccountDetails(user?.accountId!)
 
   if (!user) {
     throw new HttpError(404, 'User not found')

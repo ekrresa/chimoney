@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express'
-import { z } from 'zod'
 import jwt from 'jsonwebtoken'
+import { z } from 'zod'
 
 import { HttpError } from './error'
 import { session, setRequestUserId } from './session'
-import { verifyAccessToken } from './jwt'
+import { env } from '@/env'
 
 export function validateRequestBody(schema: z.ZodTypeAny) {
   return async (req: Request, _res: Response, next: NextFunction) => {
@@ -24,24 +24,19 @@ export function checkUserAuth(req: Request, _: Response, next: NextFunction) {
   const token = authHeader.split(' ')[1]
 
   if (!token) {
-    throw new HttpError(401, 'Unauthorized')
+    throw new HttpError(401, 'Unauthorized A')
   }
 
-  verifyAccessToken(token)
-    .then(token => {
-      const tokenPayload = jwt.decode(token) as { userId: string } | null
-      if (!tokenPayload) {
-        throw new HttpError(401, 'Please login')
-      }
+  jwt.verify(token, env.ACCESS_TOKEN_SECRET, (err, payload) => {
+    if (err || !payload) {
+      throw new HttpError(401, 'Please login')
+    }
 
-      const userId = tokenPayload['userId']
+    const userData = payload as { userId: string }
 
-      session.run(() => {
-        setRequestUserId(userId)
-        next()
-      })
+    session.run(() => {
+      setRequestUserId(userData.userId)
+      next()
     })
-    .catch(() => {
-      throw new HttpError(401, 'Unauthorized')
-    })
+  })
 }
