@@ -1,5 +1,4 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import * as localforage from 'localforage'
 import { signOut } from 'next-auth/react'
 import { toast } from 'sonner'
 
@@ -13,19 +12,26 @@ const requestConfig = {
 export const request = axios.create(requestConfig)
 export const authRequest = axios.create(requestConfig)
 
-authRequest.interceptors.request.use(
-  async config => {
-    const accessToken = await localforage.getItem('access_token')
-
-    if (!accessToken) {
-      toast.error('Session expired. Please login.')
-      localforage.clear()
-      await signOut()
-    } else {
+export function setAccessToken(accessToken: string) {
+  authRequest.interceptors.request.use(
+    async config => {
+      console.log({ accessToken })
       config.headers['Authorization'] = `Bearer ${accessToken}`
+
+      return config
+    },
+    error => Promise.reject(error),
+  )
+}
+
+authRequest.interceptors.response.use(
+  response => response,
+  async error => {
+    if (error.response?.status === 401) {
+      toast.error('Session expired. Please login')
+      return await signOut({ redirect: false })
     }
 
-    return config
+    return Promise.reject(error)
   },
-  error => Promise.reject(error),
 )

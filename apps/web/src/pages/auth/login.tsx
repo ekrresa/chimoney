@@ -29,8 +29,14 @@ export default function Login() {
       redirect: false,
     })
 
+    const redirectUrl = router.query?.redirectUrl
+
     if (result?.ok) {
-      router.push('/dashboard')
+      if (redirectUrl) {
+        router.push(redirectUrl as string)
+      } else {
+        router.push('/dashboard')
+      }
     } else {
       toast(result?.error)
     }
