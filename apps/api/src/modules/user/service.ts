@@ -1,10 +1,9 @@
 import { eq } from 'drizzle-orm'
 import { db } from '@/db'
-import { sessions, users, verificationTokens } from '@/db/schema'
+import { users, verificationTokens } from '@/db/schema'
 import { addHours } from 'date-fns'
 
 type NewUser = typeof users.$inferInsert
-type NewSession = typeof sessions.$inferInsert
 
 async function activateNewUser(userId: string, accountId: string) {
   await db.transaction(async tx => {
@@ -22,26 +21,7 @@ async function activateNewUser(userId: string, accountId: string) {
 }
 
 async function deleteUser(userId: string) {
-  await db.delete(users).where(eq(sessions.userId, userId))
-}
-
-async function deleteUserSession(userId: string) {
-  await db.delete(sessions).where(eq(sessions.userId, userId))
-}
-
-async function saveUserSession(session: NewSession) {
-  await db
-    .insert(sessions)
-    .values({
-      userId: session.userId,
-      refreshToken: session.refreshToken,
-    })
-    .onConflictDoUpdate({
-      target: sessions.userId,
-      set: {
-        refreshToken: session.refreshToken,
-      },
-    })
+  await db.delete(users).where(eq(users.id, userId))
 }
 
 async function getVerificationCode(verificationCode: string) {
@@ -63,16 +43,6 @@ async function getUserByEmail(email: string) {
   const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1)
 
   return user
-}
-
-async function getUserSession(userId: string) {
-  const [session] = await db
-    .select()
-    .from(sessions)
-    .where(eq(sessions.userId, userId))
-    .limit(1)
-
-  return session
 }
 
 async function saveVerificationCode(userId: string) {
@@ -99,12 +69,9 @@ async function saveUser(newUser: NewUser) {
 export const UserService = {
   activateNewUser,
   deleteUser,
-  deleteUserSession,
   getVerificationCode,
   getUserById,
   getUserByEmail,
-  getUserSession,
   saveUser,
-  saveUserSession,
   saveVerificationCode,
 }

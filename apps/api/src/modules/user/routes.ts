@@ -1,13 +1,7 @@
 import { Router } from 'express'
 
 import { checkUserAuth, validateRequestBody } from '@/lib/middleware'
-import {
-  LoginSchema,
-  LogoutSchema,
-  NewUserSchema,
-  TokenRefreshSchema,
-  VerifyEmailSchema,
-} from './validation'
+import { LoginSchema, NewUserSchema, VerifyEmailSchema } from './validation'
 import * as AuthHandler from './auth-handler'
 import * as UserHandler from './user-handler'
 
@@ -22,18 +16,10 @@ authRouter.post(
   AuthHandler.signupUser,
 )
 
-authRouter.post('/logout', validateRequestBody(LogoutSchema), AuthHandler.logoutUser)
-
 authRouter.post(
   '/verify',
   validateRequestBody(VerifyEmailSchema),
   AuthHandler.verifyUserEmail,
-)
-
-authRouter.post(
-  '/tokens/refresh',
-  validateRequestBody(TokenRefreshSchema),
-  AuthHandler.refreshTokens,
 )
 
 userRouter.get('/me', checkUserAuth, UserHandler.getUserProfile)

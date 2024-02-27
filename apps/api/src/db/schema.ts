@@ -35,27 +35,6 @@ export const users = pgTable(
   },
 )
 
-export const sessions = pgTable(
-  'sessions',
-  {
-    id: varchar('id', { length: 255 })
-      .notNull()
-      .primaryKey()
-      .$defaultFn(() => createId()),
-    userId: varchar('user_id', { length: 255 })
-      .notNull()
-      .references(() => users.id, { onDelete: 'cascade' }),
-    refreshToken: text('refresh_token').notNull(),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { mode: 'string' }).notNull().defaultNow(),
-  },
-  table => {
-    return {
-      userIdIndex: uniqueIndex('user_id_idx').on(table.userId),
-    }
-  },
-)
-
 export const verificationTokens = pgTable(
   'verification_tokens',
   {

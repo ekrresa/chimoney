@@ -16,7 +16,7 @@ export function globalErrorHandler(
     return res.status(400).json({ message: 'Request body is invalid', errors })
   }
 
-  res.status(500).json({ message: 'Internal server error' })
+  return res.status(500).send({ message: 'Internal server error' })
 }
 
 export class HttpError extends Error {
